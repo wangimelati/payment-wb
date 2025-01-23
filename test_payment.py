@@ -15,6 +15,10 @@ class TestPaymentSystem(unittest.TestCase):
         """Test with an invalid card number."""
         self.assertFalse(self.payment_system.validate_card(1234567890123456))
 
+    def test_validate_card_edge_case(self):
+        self.assertTrue(self.payment_system.validate_card(49927398716))
+        self.assertFalse(self.payment_system.validate_card(49927398717))
+
     def test_authenticate_user_valid(self):
         """Test user authentication with correct credentials."""
         self.assertTrue(self.payment_system.authenticate_user('user123', '1234'))
@@ -26,6 +30,9 @@ class TestPaymentSystem(unittest.TestCase):
     def test_authenticate_userUSN_invalid(self):
         """Test user authentication with incorrect credentials."""
         self.assertFalse(self.payment_system.authenticate_user('wronguser', '1234'))
+
+    def test_authenticate_user_both_invalid(self):
+        self.assertFalse(self.payment_system.authenticate_user('wronguser', 'wrongpin'))
 
     def test_process_payment_success(self):
         """Test successful payment process."""
@@ -50,3 +57,7 @@ class TestPaymentSystem(unittest.TestCase):
     def test_process_payment_edge_case(self):
         with self.assertRaises(ValueError):
             self.payment_system.process_payment(4532015112830366, 0, 'user123', '1234')
+
+    def test_process_payment_valid_amount(self):
+        result = self.payment_system.process_payment(4532015112830366, 1, 'user123', '1234')
+        self.assertEqual(result, "Payment of $1 processed for user user123")
